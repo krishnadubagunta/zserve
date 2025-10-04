@@ -1,0 +1,10 @@
+[
+  {
+    "adapter": "CodeLLDB",
+    "label": "$zigsh (CodeLLDB)",
+    "request": "launch",
+    "name": "$zigsh (CodeLLDB)",
+    "program": "$zigsh -f ../plumcache/zig-out/docs",
+    "stopOnEntry": false
+  }
+]
