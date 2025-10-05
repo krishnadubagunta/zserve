@@ -1,5 +1,5 @@
 const std = @import("std");
-const zigsh = @import("zigsh");
+const zserve = @import("zserve");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -24,7 +24,7 @@ pub fn main() !void {
         }
     }
 
-    zigsh.Server(allocator, host, port, folder) catch |err| {
+    zserve.Server(allocator, host, port, folder) catch |err| {
         switch (err) {
             .FolderNotFound => std.log.err("Folder not found: {}", .{err}),
             .AccessDenied => std.log.err("Access denied: {}", .{err}),
