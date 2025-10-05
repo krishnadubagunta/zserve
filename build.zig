@@ -143,7 +143,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_exe_tests.step);
 
     const debug_artifact = b.addRunArtifact(exe);
-    debug_artifact.addArgs(&.{"-f ../plumcache/zig-out/docs"});
+    debug_artifact.addArgs(&.{ "-f", "test_folder" });
 
     const debug_step = b.step("debug", "Run debug");
     debug_step.dependOn(&debug_artifact.step);
