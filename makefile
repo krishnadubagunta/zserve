@@ -34,3 +34,7 @@ install: release
 
 uninstall:
 	rm -f /usr/local/bin/$(EXE_NAME)
+
+brew-release: release
+	tar -czf $(EXE_NAME)-$(VERSION).tar.gz -C $(BUILD_DIR)/bin $(EXE_NAME)
+	gh release create v$(VERSION) $(EXE_NAME)-$(VERSION).tar.gz --title "$(EXE_NAME) $(VERSION)"
