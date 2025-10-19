@@ -2,6 +2,8 @@ const std = @import("std");
 const file_reader_lib = @import("file_reader.zig");
 const http = std.http;
 const content_identifier = @import("content_identifier.zig");
+const anyGetHandler = @import("router/any_get_handler.zig");
+const context = @import("context.zig");
 
 pub const Server = struct {
     allocator: std.mem.Allocator,
@@ -49,38 +51,18 @@ pub const Server = struct {
                     break;
                 };
 
-                switch (request.head.method) {
-                    .GET => {
-                        var token_file_name = std.mem.tokenizeAny(u8, request.head.target, "/");
-                        const file_name: []const u8 = token_file_name.next() orelse "index.html";
-                        const file = rd.get_file(file_name) catch |err| {
-                            std.log.err("Failed to get file: {}, with file name: {s}", .{ err, file_name });
-                            try request.respond("Not found", .{ .status = .not_found });
-                            break;
-                        };
-                        const contentType = content_identifier.contentType(file_name);
-                        const buffer = rd.readFile(file) catch |err| {
-                            std.log.err("Failed to read file: {}, with file name: {s}", .{ err, file_name });
-                            try request.respond("Not found", .{ .status = .not_found });
-                            break;
-                        };
-                        request.respond(buffer, .{
-                            .status = .ok,
-                            .extra_headers = &.{
-                                .{ .name = "Content-Type", .value = contentType },
-                                // .{ .name = "Content-Length", .value = try std.fmt.allocPrint(self.allocator, "{}", .{file_size}) }, .{ .name = "Cache-Control", .value = "max-age=3600" }
-                            },
-                        }) catch |err| {
-                            std.log.err("Failed to respond to HTTP request: {}", .{err});
-                            break;
-                        };
-                        std.heap.page_allocator.free(buffer);
+                var ctx = context.Context.init(&request, rd);
+
+                switch (ctx.request.head.method) {
+                    .OPTIONS => {
+                        ctx.respond("OK");
+                        return ctx.handleResponse();
                     },
+                    .GET => {},
                     else => {
-                        std.log.warn("Unsupported method: {any}", .{request.head.method});
-                        request.respond("Method not allowed", .{ .status = .method_not_allowed }) catch |err| {
-                            std.log.err("Failed to respond to HTTP request: {}", .{err});
-                        };
+                        return ctx.request.respond("", .{
+                            .status = .NotFound,
+                        });
                     },
                 }
             }

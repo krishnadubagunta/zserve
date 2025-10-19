@@ -1,0 +1,20 @@
+[router]
+root = "./"
+
+[compression]
+enabled = false
+strategy = "gzip"
+
+[cache]
+enabled = false
+
+[cache.all]
+enabled = false
+max_size = 1_000_000
+
+[cache.routes]
+path = [
+ "./index.html",
+ "./sources.tar",
+ "./main.wasm"
+]
